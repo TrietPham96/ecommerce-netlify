@@ -1,3 +1,4 @@
+import Vue from 'vue'
 import axios from "axios";
 import data from "~/static/storedata.json";
 
@@ -5,11 +6,17 @@ export const state = () => ({
   cartUIStatus: "idle",
   storedata: data,
   cart: [],
-  clientSecret: "" // Required to initiate the payment from the client
+  clientSecret: "", // Required to initiate the payment from the client
+  categories: [],
+  products: [],
+  productsByCategory: []
 });
 
 export const getters = {
-  featuredProducts: state => state.storedata.slice(0, 3),
+  getCategories: state => state.categories,
+  getProducts: state => state.products,
+  getProductsByCategory: state => state.productsByCategory,
+  featuredProducts: state => state.products.slice(0, 10),
   women: state => state.storedata.filter(el => el.gender === "Female"),
   men: state => state.storedata.filter(el => el.gender === "Male"),
   cartCount: state => {
@@ -46,9 +53,9 @@ export const mutations = {
       ? (itemfound.quantity += payload.quantity)
       : state.cart.push(payload)
   },
-   setClientSecret: (state, payload) => {
+  setClientSecret: (state, payload) => {
     state.clientSecret = payload;
-   },
+  },
   addOneToCart: (state, payload) => {
     let itemfound = state.cart.find(el => el.id === payload.id)
     itemfound ? itemfound.quantity++ : state.cart.push(payload)
@@ -61,10 +68,27 @@ export const mutations = {
   },
   removeAllFromCart: (state, payload) => {
     state.cart = state.cart.filter(el => el.id !== payload.id)
+  },
+  SET_CATEGORIESLIST: (state, value) => {
+    state.categories = value;
+  },
+  SET_PRODUCTSLIST: (state, value) => {
+    state.products = value;
+  },
+  SET_PRODUCTSLISTBYCATEGORY: (state, value) => {
+    state.productsByCategory = value;
   }
 };
 
 export const actions = {
+  async nuxtServerInit({ dispatch }) {
+    try {
+      await dispatch('getCategoriesList')
+      await dispatch('getProductsList')
+    } catch (e) {
+      throw e
+    }
+  },
   async createPaymentIntent({ getters, commit }) {
     try {
       // Create a PaymentIntent with the information about the order
@@ -88,5 +112,36 @@ export const actions = {
     } catch (e) {
       console.log("error", e);
     }
+  },
+  getCategoriesList({ commit }) {
+    return new Promise((resolve, reject) => {
+      Vue.prototype.$commerce.categories.list().then(response => {
+        if (response) {
+          commit("SET_CATEGORIESLIST", response.data);
+          resolve()
+        }
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  },
+  getProductsList({ commit }) {
+    return new Promise((resolve, reject) => {
+      Vue.prototype.$commerce.products.list().then(response => {
+        if (response) {
+          commit("SET_PRODUCTSLIST", response.data);
+          resolve()
+        }
+      }).catch(error => {
+        reject(error)
+      })
+    })
+  },
+  getProductsListByCategory({ commit }, id) {
+    let pros = [...this.state.products];
+    if (id && pros) {
+      pros = pros.filter((x) => x.categories.find((y) => y.id == id));
+    }
+    commit("SET_PRODUCTSLISTBYCATEGORY", pros);
   }
 };

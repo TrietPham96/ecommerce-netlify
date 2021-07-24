@@ -3,11 +3,15 @@
     <h2>
       <span>Featured Products</span>
     </h2>
-    <div class="featureditems">
-      <div class="item" v-for="product in featuredProducts" :key="product.id">
-        <img :src="`/products/${product.img}`" />
+    <div class="featureditems" v-if="featuredProductsList.length > 0">
+      <div
+        class="item"
+        v-for="product in featuredProductsList"
+        :key="product.id"
+      >
+        <img :src="product.media.source" />
         <h3>{{ product.name }}</h3>
-        <h4>{{ product.price | dollar }}</h4>
+        <h4>{{ product.price.formatted | dollar }}</h4>
         <NuxtLink :to="`/product/${product.id}`">
           <button class="multi-item">View Item ></button>
         </NuxtLink>
@@ -17,12 +21,15 @@
 </template>
 
 <script>
+import { mapGetters } from "vuex";
+
 export default {
   computed: {
-    featuredProducts() {
-      return this.$store.getters.featuredProducts;
-    }
-  }
+    ...mapGetters(["featuredProducts"]),
+    featuredProductsList() {
+      return this.featuredProducts;
+    },
+  },
 };
 </script>
 

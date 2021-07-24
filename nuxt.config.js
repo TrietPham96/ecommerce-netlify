@@ -1,8 +1,39 @@
-import data from './static/storedata.json'
 let dynamicRoutes = () => {
-  return new Promise(resolve => {
-    resolve(data.map(el => `product/${el.id}`))
-  })
+  let productsList = new Promise((resolve, reject) => {
+    axios
+      .get("https://api.chec.io/v1/products", {
+        headers: {
+          "X-Authorization":
+            "your_key",
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+        },
+      }).then((res) => {
+        resolve(res.data.data.map((el) => `product/${el.id}`));
+      }), error => {
+        reject(error);
+      }
+  });
+
+  let categoriesList = new Promise((resolve, reject) => {
+    axios
+      .get("https://api.chec.io/v1/categories", {
+        headers: {
+          "X-Authorization":
+            "your_key",
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+        },
+      }).then((res) => {
+        resolve(res.data.data.map((el) => `category/${el.id}`));
+      }), error => {
+        reject(error);
+      }
+  });
+  let promises = [categoriesList, productsList];
+  return Promise.all(promises).then(values => {
+    return (values.join().split(',')).concat(['/'])
+  });
 }
 
 export default {
@@ -46,7 +77,9 @@ export default {
   /*
    ** Plugins to load before mounting the App
    */
-  plugins: [`~/plugins/currency-filter.js`],
+  plugins: [
+    { src: "~/plugins/currency-filter.js" },
+    { src: "~/plugins/commerce.js" }],
   /*
    ** Nuxt.js modules
    */
@@ -58,6 +91,6 @@ export default {
     /*
      ** You can extend webpack config here
      */
-    extend(config, ctx) {}
+    extend(config, ctx) { }
   }
 }

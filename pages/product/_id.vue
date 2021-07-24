@@ -1,39 +1,63 @@
 <template>
-  <div>
+  <div v-if="Object.keys(productObj).length !== 0">
     <section class="item-contain">
       <section class="img">
-        <img :src="`/products/${product.img}`" />
+        <img :src="productObj.media.source" />
       </section>
       <section class="product-info">
-        <h1>{{ product.name }}</h1>
+        <h1>{{ productObj.name }}</h1>
         <star-rating
-          :rating="product.starrating"
+          :rating="productObj.starrating"
           :star-size="15"
           :show-rating="false"
           active-color="#000"
           style="margin: 5px 0"
         ></star-rating>
-        <h4 class="price">{{ product.price | dollar }}</h4>
-        <p>{{ product.description }}</p>
-        <p>Lorem ipsum, dolor sit amet consectetur adipisicing elit. Iusto velit dolores repudiandae animi quidem, eveniet quod dolor facilis dicta eligendi ullam error. Assumenda in fugiat natus enim similique nam itaque.</p>
+        <h4 class="price">{{ productObj.price.formatted | dollar }}</h4>
+        <p>{{ productObj.description }}</p>
+        <p>
+          Lorem ipsum, dolor sit amet consectetur adipisicing elit. Iusto velit
+          dolores repudiandae animi quidem, eveniet quod dolor facilis dicta
+          eligendi ullam error. Assumenda in fugiat natus enim similique nam
+          itaque.
+        </p>
         <div class="product-options">
           <div class="quantity">
-            <button class="update-num" @click="quantity > 0 ? quantity-- : quantity = 0">-</button>
+            <button
+              class="update-num"
+              @click="quantity > 0 ? quantity-- : (quantity = 0)"
+            >
+              -
+            </button>
             <input type="number" v-model="quantity" />
             <button class="update-num" @click="quantity++">+</button>
           </div>
-          <div v-if="product.sizes" class="size">
-            <select v-model="size" class="size-picker" @change="showSizeRequiredMessage = false">
+          <div v-if="productObj.sizes" class="size">
+            <select
+              v-model="size"
+              class="size-picker"
+              @change="showSizeRequiredMessage = false"
+            >
               <option :value="null" disabled hidden>Size</option>
-              <option v-for="(size, key) in product.sizes" :key="key" :value="size">{{ size }}</option>
+              <option
+                v-for="(size, key) in productObj.sizes"
+                :key="key"
+                :value="size"
+              >
+                {{ size }}
+              </option>
             </select>
           </div>
         </div>
-        <p v-if="showSizeRequiredMessage" class="size-required-message">Please choose a size</p>
+        <p v-if="showSizeRequiredMessage" class="size-required-message">
+          Please choose a size
+        </p>
         <p>
           Available in additional colors:
           <strong>
-            <span :style="`color: ${product.color}`">{{ product.color }}</span>
+            <span :style="`color: ${productObj.color}`">{{
+              productObj.color
+            }}</span>
           </strong>
         </p>
         <p>
@@ -46,28 +70,33 @@
       <h2>Reviews</h2>
       <!-- maybe an image of a person? -->
       <star-rating
-        :rating="product.starrating"
+        :rating="productObj.starrating"
         active-color="#000"
         :star-size="15"
         :show-rating="false"
         style="margin: 5px 0"
       ></star-rating>
-      <p>{{ product.review }}</p>
-      <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Rerum iusto placeat consequatur voluptas sit mollitia ratione autem, atque sequi odio laborum, recusandae quia distinctio voluptatibus sint, quae aliquid possimus exercitationem.</p>
+      <p>{{ productObj.review }}</p>
+      <p>
+        Lorem ipsum dolor sit amet consectetur adipisicing elit. Rerum iusto
+        placeat consequatur voluptas sit mollitia ratione autem, atque sequi
+        odio laborum, recusandae quia distinctio voluptatibus sint, quae aliquid
+        possimus exercitationem.
+      </p>
     </div>
     <app-featured-products />
   </div>
 </template>
 
 <script>
-import { mapState } from "vuex";
+import { mapState, mapGetters } from "vuex";
 import StarRating from "vue-star-rating/src/star-rating.vue";
 import AppFeaturedProducts from "~/components/AppFeaturedProducts.vue";
 
 export default {
   components: {
     StarRating,
-    AppFeaturedProducts
+    AppFeaturedProducts,
   },
   data() {
     return {
@@ -75,14 +104,26 @@ export default {
       quantity: 1,
       size: null,
       showSizeRequiredMessage: false,
-      tempcart: [] // this object should be the same as the json store object, with additional params, quantity and size
+      tempcart: [], // this object should be the same as the json store object, with additional params, quantity and size
     };
   },
   computed: {
+    ...mapGetters(["getProducts"]),
     ...mapState(["storedata"]),
     product() {
-      return this.storedata.find(el => el.id === this.id);
-    }
+      return this.storedata.find((el) => el.id === this.id);
+    },
+    productObj() {
+      let products = [...this.getProducts];
+      let item = {};
+      if (products) {
+        item = Object.assign(
+          {},
+          products.find((el) => el.id === this.id)
+        );
+      }
+      return item;
+    },
   },
   methods: {
     cartAdd() {
@@ -92,15 +133,15 @@ export default {
       }
 
       let item = this.product;
-      item = { 
-        ...item, 
-        quantity: this.quantity, 
-        size: this.size 
+      item = {
+        ...item,
+        quantity: this.quantity,
+        size: this.size,
       };
       this.tempcart.push(item);
-      this.$store.commit("addToCart", {...item});
-    }
-  }
+      this.$store.commit("addToCart", { ...item });
+    },
+  },
 };
 </script>
 

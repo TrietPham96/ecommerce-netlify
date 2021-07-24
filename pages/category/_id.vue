@@ -5,8 +5,8 @@
 </template>
 
 <script>
-import { mapGetters } from "vuex";
 import AppStoreGrid from "~/components/AppStoreGrid.vue";
+import { mapGetters } from "vuex";
 
 export default {
   components: {
@@ -16,7 +16,7 @@ export default {
     ...mapGetters(["getProductsByCategory"]),
   },
   created() {
-    this.$store.dispatch("getProductsListByCategory", null);
+    this.$store.dispatch("getProductsListByCategory", this.$route.params.id);
   }
 };
 </script>

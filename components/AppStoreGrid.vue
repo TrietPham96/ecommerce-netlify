@@ -1,10 +1,10 @@
 <template>
   <div class="storegrid">
     <transition-group name="items" tag="section" class="content">
-      <div v-for="item in filteredprice" :key="item.id" class="item">
+      <div v-for="item in products" :key="item.id" class="item">
         <div class="img-contain">
-          <NuxtLink :to="`product/${item.id}`">
-            <img :src="`/products/${item.img}`" />
+          <NuxtLink :to="`/product/${item.id}`">
+            <img :src="item.media.source" />
           </NuxtLink>
         </div>
         <star-rating
@@ -15,15 +15,20 @@
           style="margin: 5px 0"
         ></star-rating>
         <h3>{{ item.name }}</h3>
-        <h4 class="price">{{ item.price | dollar }}</h4>
-        <NuxtLink :to="`product/${item.id}`">
+        <h4 class="price">{{ item.price.formatted | dollar }}</h4>
+        <NuxtLink :to="`/product/${item.id}`">
           <button class="multi-item">View Item ></button>
         </NuxtLink>
       </div>
     </transition-group>
     <aside>
       <h3>Special Sale</h3>
-      <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Veniam libero iusto nemo laboriosam perferendis voluptas ullam officiis, quibusdam quas quam eveniet est fugit delectus corporis incidunt nam esse suscipit itaque?</p>
+      <p>
+        Lorem ipsum dolor sit amet consectetur adipisicing elit. Veniam libero
+        iusto nemo laboriosam perferendis voluptas ullam officiis, quibusdam
+        quas quam eveniet est fugit delectus corporis incidunt nam esse suscipit
+        itaque?
+      </p>
       <h3>Filter by Price:</h3>
       <p style="margin-top: 5px">
         Max Price
@@ -61,9 +66,9 @@ export default {
     };
   },
   computed: {
-    filteredprice() {
-      return this.data.filter(el => el.price < this.pricerange);
-    }
+    products() {
+      return this.data.filter(el => el.price.formatted < this.pricerange);
+    },
   },
   components: {
     StarRating

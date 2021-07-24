@@ -9,11 +9,10 @@
         <li>
           <nuxt-link to="/all">All</nuxt-link>
         </li>
-        <li>
-          <nuxt-link to="/women">Women</nuxt-link>
-        </li>
-        <li>
-          <nuxt-link to="/men">Men</nuxt-link>
+        <li v-for="category in categories" :key="category.id">
+          <nuxt-link :to="`/category/${category.id}`">
+            {{ category.name }}
+          </nuxt-link>
         </li>
         <li>
           <div class="carttotal" v-if="cartCount > 0">{{ cartCount }}</div>
@@ -29,8 +28,15 @@ import { mapGetters } from "vuex";
 
 export default {
   computed: {
-    ...mapGetters(["cartCount"])
-  }
+    ...mapGetters(["cartCount", "getCategories"]),
+    categories() {
+      let cates = this.getCategories;
+      if (cates) {
+        return cates;
+      }
+      return null;
+    },
+  },
 };
 </script>
 

@@ -109,18 +109,11 @@ export default {
   },
   computed: {
     ...mapGetters(["getProducts"]),
-    ...mapState(["storedata"]),
-    product() {
-      return this.storedata.find((el) => el.id === this.id);
-    },
     productObj() {
       let products = [...this.getProducts];
       let item = {};
       if (products) {
-        item = Object.assign(
-          {},
-          products.find((el) => el.id === this.id)
-        );
+        item = Object.assign({}, products.find((el) => el.id === this.id));
       }
       return item;
     },

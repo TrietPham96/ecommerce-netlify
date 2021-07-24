@@ -1,3 +1,5 @@
+import axios from "axios";
+
 let dynamicRoutes = () => {
   let productsList = new Promise((resolve, reject) => {
     axios

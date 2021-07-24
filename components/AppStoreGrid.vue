@@ -1,5 +1,5 @@
 <template>
-  <div class="storegrid">
+  <div class="storegrid" v-if="products.length > 0">
     <transition-group name="items" tag="section" class="content">
       <div v-for="item in products" :key="item.id" class="item">
         <div class="img-contain">
@@ -51,28 +51,31 @@
 
 <script>
 import StarRating from "vue-star-rating/src/star-rating.vue";
+import { mapGetters } from "vuex";
 
 export default {
-  props: {
-    data: {
-      required: true
-    }
-  },
+  props: {},
   data() {
     return {
       min: 0,
       max: 200,
-      pricerange: 200
+      pricerange: 200,
+      id: this.$route.params.id,
     };
   },
   computed: {
+    ...mapGetters(["getProducts"]),
     products() {
-      return this.data.filter(el => el.price.formatted < this.pricerange);
+      let pros = [...this.getProducts];
+      if (this.id && pros) {
+        pros = pros.filter((x) => x.categories.find((y) => y.id == this.id));
+      }
+      return pros;
     },
   },
   components: {
-    StarRating
-  }
+    StarRating,
+  },
 };
 </script>
 

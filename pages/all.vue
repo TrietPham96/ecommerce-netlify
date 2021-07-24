@@ -1,11 +1,10 @@
 <template>
   <div>
-    <app-store-grid :data="getProductsByCategory" />
+    <app-store-grid />
   </div>
 </template>
 
 <script>
-import { mapGetters } from "vuex";
 import AppStoreGrid from "~/components/AppStoreGrid.vue";
 
 export default {
@@ -13,11 +12,7 @@ export default {
     AppStoreGrid,
   },
   computed: {
-    ...mapGetters(["getProductsByCategory"]),
   },
-  created() {
-    this.$store.dispatch("getProductsListByCategory", null);
-  }
 };
 </script>
 

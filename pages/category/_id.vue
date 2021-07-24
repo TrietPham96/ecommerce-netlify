@@ -1,6 +1,6 @@
 <template>
   <div>
-    <app-store-grid :data="getProductsByCategory" />
+    <app-store-grid />
   </div>
 </template>
 
@@ -13,10 +13,8 @@ export default {
     AppStoreGrid,
   },
   computed: {
-    ...mapGetters(["getProductsByCategory"]),
   },
   created() {
-    this.$store.dispatch("getProductsListByCategory", this.$route.params.id);
   }
 };
 </script>
